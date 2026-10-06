@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CARTE MULTI-DOWNLOADER</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #050508;
+      --card: rgba(18, 18, 24, 0.85);
+      --card-border: rgba(124, 92, 255, 0.25);
+      --accent: #00b4ff;
+      --accent2: #7c5cff;
+      --accent-hover: #33c4ff;
+      --text: #f4f4f8;
+      --muted: #9a9ab0;
+      --success: #22c55e;
+      --error: #ef4444;
+      --glow: 0 0 40px rgba(0, 180, 255, 0.15);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1.5rem 1rem 3rem;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Logo as subtle background watermark */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: min(90vw, 700px);
+      height: min(50vw, 280px);
+      background: url('logo.jpg') center/contain no-repeat;
+      opacity: 0.07;
+      pointer-events: none;
+      z-index: 0;
+      filter: blur(1px);
+    }
+
+    .container {
+      max-width: 680px;
+      width: 100%;
+      position: relative;
+      z-index: 1;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .logo-wrap {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 1.2rem;
+    }
+
+    .logo-wrap img {
+      max-width: 320px;
+      width: 85%;
+      height: auto;
+      filter: drop-shadow(0 0 18px rgba(0, 180, 255, 0.35));
+    }
+
+    h1 {
+      font-size: clamp(1.6rem, 5vw, 2.1rem);
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      background: linear-gradient(135deg, #ffffff 0%, #00b4ff 50%, #7c5cff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.35rem;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+
+    .platforms {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 1.1rem;
+    }
+
+    .platform {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      padding: 0.3rem 0.75rem;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      padding: 1.8rem 1.6rem;
+      box-shadow: var(--glow);
+      backdrop-filter: blur(12px);
+    }
+
+    label {
+      display: block;
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-bottom: 0.45rem;
+      font-weight: 500;
+    }
+
+    input[type="url"] {
+      width: 100%;
+      padding: 0.95rem 1.15rem;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      background: rgba(0,0,0,0.45);
+      color: var(--text);
+      font-size: 1rem;
+      outline: none;
+      transition: border 0.2s, box-shadow 0.2s;
+    }
+
+    input[type="url"]:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(0, 180, 255, 0.15);
+    }
+
+    .options {
+      display: flex;
+      gap: 1.1rem;
+      margin: 1.3rem 0 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .option {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      cursor: pointer;
+      font-size: 0.88rem;
+      color: var(--muted);
+      transition: color 0.15s;
+    }
+
+    .option:hover { color: var(--text); }
+
+    .option input {
+      accent-color: var(--accent);
+      width: 16px;
+      height: 16px;
+    }
+
+    button#btn {
+      width: 100%;
+      padding: 1rem;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #00b4ff, #7c5cff);
+      color: white;
+      font-size: 1.05rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.15s, filter 0.15s, box-shadow 0.15s;
+      letter-spacing: 0.3px;
+      box-shadow: 0 4px 20px rgba(0, 180, 255, 0.3);
+    }
+
+    button#btn:hover:not(:disabled) {
+      transform: translateY(-1px);
+      filter: brightness(1.08);
+      box-shadow: 0 6px 28px rgba(0, 180, 255, 0.4);
+    }
+
+    button#btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    #status {
+      margin-top: 1.2rem;
+      padding: 0.9rem 1rem;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      display: none;
+      font-weight: 500;
+    }
+
+    #status.loading {
+      display: block;
+      background: rgba(0, 180, 255, 0.1);
+      border: 1px solid rgba(0, 180, 255, 0.25);
+      color: #7dd3fc;
+    }
+
+    #status.success {
+      display: block;
+      background: rgba(34, 197, 94, 0.1);
+      border: 1px solid rgba(34, 197, 94, 0.25);
+      color: var(--success);
+    }
+
+    #status.error {
+      display: block;
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.25);
+      color: var(--error);
+    }
+
+    #result {
+      margin-top: 1.5rem;
+      display: none;
+    }
+
+    .media-info {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+      background: rgba(0,0,0,0.4);
+      padding: 1rem;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .media-info img {
+      width: 110px;
+      height: 110px;
+      object-fit: cover;
+      border-radius: 10px;
+      flex-shrink: 0;
+    }
+
+    .media-info h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+      line-height: 1.3;
+    }
+
+    .media-info p {
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    .download-btns {
+      margin-top: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+    }
+
+    .download-btns a {
+      display: block;
+      text-align: center;
+      padding: 0.8rem;
+      background: linear-gradient(135deg, #00b4ff, #7c5cff);
+      color: white;
+      text-decoration: none;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: filter 0.15s, transform 0.15s;
+    }
+
+    .download-btns a:hover {
+      filter: brightness(1.1);
+      transform: translateY(-1px);
+    }
+
+    footer {
+      margin-top: 2.8rem;
+      text-align: center;
+      font-size: 0.78rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    footer a:hover { text-decoration: underline; }
+
+    .disclaimer {
+      margin-top: 0.8rem;
+      font-size: 0.72rem;
+      opacity: 0.7;
+    }
+
+    @media (max-width: 480px) {
+      .card { padding: 1.4rem 1.1rem; }
+      .media-info { flex-direction: column; align-items: center; text-align: center; }
+      .media-info img { width: 140px; height: 140px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo-wrap">
+        <img src="logo.jpg" alt="CARTEL Mult Engineering Ltd" />
+      </div>
+      <h1>CARTE MULTI-DOWNLOADER</h1>
+      <p class="subtitle">Download videos &amp; photos from TikTok · Instagram · Facebook · X</p>
+      <div class="platforms">
+        <span class="platform">TikTok</span>
+        <span class="platform">Instagram</span>
+        <span class="platform">Facebook</span>
+        <span class="platform">X / Twitter</span>
+        <span class="platform">+1000 sites</span>
+      </div>
+    </header>
+
+    <div class="card">
+      <label for="url">Paste link address</label>
+      <input type="url" id="url" placeholder="https://www.tiktok.com/@user/video/..." autocomplete="off" spellcheck="false" />
+
+      <div class="options">
+        <label class="option">
+          <input type="radio" name="format" value="best" checked /> Best quality
+        </label>
+        <label class="option">
+          <input type="radio" name="format" value="audio" /> Audio only (MP3)
+        </label>
+        <label class="option">
+          <input type="radio" name="format" value="photo" /> Photos / images
+        </label>
+      </div>
+
+      <button id="btn" onclick="startDownload()">Download Now</button>
+
+      <div id="status"></div>
+      <div id="result"></div>
+    </div>
+
+    <footer>
+      <strong>CARTE MULTI-DOWNLOADER</strong> · Powered by <a href="https://github.com/yt-dlp/yt-dlp" target="_blank" rel="noopener">yt-dlp</a><br>
+      Self-hosted · Personal use only
+      <div class="disclaimer">
+        Respect creators’ rights &amp; platform Terms of Service.<br>
+        Only download content you own or have permission to save.
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    const statusEl = document.getElementById('status');
+    const resultEl = document.getElementById('result');
+    const btn = document.getElementById('btn');
+
+    function showStatus(msg, type) {
+      statusEl.style.display = 'block';
+      statusEl.className = type;
+      statusEl.textContent = msg;
+    }
+
+    async function startDownload() {
+      const url = document.getElementById('url').value.trim();
+      if (!url) {
+        showStatus('Please paste a valid link', 'error');
+        return;
+      }
+
+      const format = document.querySelector('input[name="format"]:checked').value;
+      btn.disabled = true;
+      resultEl.style.display = 'none';
+      showStatus('Fetching media info… this may take a few seconds', 'loading');
+
+      try {
+        const res = await fetch('/api/info', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url, format })
+        });
+        const data = await res.json();
+
+        if (!res.ok) throw new Error(data.error || 'Failed to fetch media');
+
+        showStatus('Ready to download!', 'success');
+        resultEl.style.display = 'block';
+        resultEl.innerHTML = `
+          <div class="media-info">
+            ${data.thumbnail ? `<img src="${data.thumbnail}" alt="thumbnail" onerror="this.style.display='none'">` : ''}
+            <div>
+              <h3>${escapeHtml(data.title || 'Media')}</h3>
+              <p>${escapeHtml(data.uploader || '')}${data.duration ? ' · ' + data.duration + 's' : ''}</p>
+            </div>
+          </div>
+          <div class="download-btns">
+            ${(data.formats || []).map(f => `
+              <a href="/api/download?url=${encodeURIComponent(url)}&format=${encodeURIComponent(f.format_id)}&ext=${f.ext}" download>
+                Download ${escapeHtml(f.quality || f.ext.toUpperCase())} (${f.ext})
+              </a>
+            `).join('')}
+          </div>
+        `;
+      } catch (err) {
+        showStatus(err.message || 'Something went wrong. Check the link and try again.', 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    document.getElementById('url').addEventListener('keydown', e => {
+      if (e.key === 'Enter') startDownload();
+    });
+  </script>
+</body>
+</html>
